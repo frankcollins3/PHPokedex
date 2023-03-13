@@ -1,0 +1,17 @@
+body {
+  background-color: peachpuff;
+  min-height: 100vh;
+}
+
+
+
+.column {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+h1 {
+  color: orange;
+}
