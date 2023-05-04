@@ -19,10 +19,6 @@ const rootValue = {
     }
 }
 
-console.log('rootValue');
-console.log(rootValue);
-
-
 function App() {
   return (
 
