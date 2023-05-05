@@ -1,13 +1,22 @@
 import express from 'express';
-import expressGraphQL from 'express-graphql'
-// expressGraphQL.graphqlHTTP()
-
-console.log('expressGraphQL log:')
-console.log(expressGraphQL)
-
+import expressGraphQL from 'express-graphql'   // expressGraphQL returns an object with functions to execute 
+import { GraphQLSchema, GraphQLObjectType, GraphQLString, } from 'graphql'
 const app = express()
 
-app.use('/graphql', expressGraphQL.graphqlHTTP({
+const schema = new GraphQLSchema({
+    query: new GraphQLObjectType({
+        name: 'Hello', 
+        fields: () => ({
+            message: { 
+                type: GraphQLString, 
+                resolve: ()=> 'Hey You Guys!' 
+            }
+
+        })
+    })
+})
+
+app.use('/graphql', expressGraphQL.graphqlHTTP({  // used to need expressGraphQL( { graphiql: true }) --> now its expressGraphQL.graphqlHTTP
     // schema: schema,
     graphiql: true
 }))
