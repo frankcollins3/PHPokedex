@@ -95,8 +95,10 @@ const PokemonType = new GraphQLObjectType({
     name: 'Pokemon',
     description: "This is a pokemon with data populated from the API",
     fields: () => ({
-        id: { type: new GraphQLNonNull(GraphQLInt) },
-        name: { type: new GraphQLNonNull(GraphQLString) }
+        // id: { type: new GraphQLNonNull(GraphQLInt) },
+        name: { type: GraphQLString },
+        id: { type: GraphQLInt } // I dont want it to be non nulled. it can be nulled to allow for quicker iteration of addPokemon
+        
     })
 })
 
@@ -166,6 +168,20 @@ const RootMutationType = new GraphQLObjectType({
         authors.push(author)
         return author
       }
+    },
+    addPokemon: {
+        type: PokemonType,
+        description: 'Add a pokemon',
+        args: {
+            // arg to run condition against. With a strict equality match
+            name: { type: GraphQLString },            
+            // id: { type: GraphQLString}
+        },
+        resolve: (parent, args) => {
+            const poke = { id: pokemon.length + 1, name: args.name }
+        pokemon.push(poke)
+        return poke
+        }
     }
   })
 })
