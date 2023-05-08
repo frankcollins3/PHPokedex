@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require("path");
 const cors = require('cors')
+const axios = require("axios")
 // const indexRouter = require('./routes/index');
 // const usersRouter = require('./routes/users');
 const dataRouter = require('./routes/data')
@@ -9,6 +10,35 @@ const anotherDataRouter = require('./routes/allPokemon')
 // graphiql ----------> localhost:5000/graphql
 const PORT = 5000;
 const app = express();
+
+const allPokemonAPI = async () => {
+    // let predata = await axios.get(`https://pokeapi.co/`);
+    let bucket = new Array() || []
+    let pokemon = await axios.get(`https://pokeapi.co/api/v2/pokemon?limit=151`)
+        let data = pokemon.data.results
+        await data.forEach(data => bucket.push({name: data.name, id: bucket.length + 1 }))
+        if (bucket) { return bucket }
+
+// this array was taken from pokemondata.data.results    
+// let array = [
+//     {name: 'bulbasaur', url: 'https://pokeapi.co/api/v2/pokemon/1/'},
+//     {name: 'ivysaur', url: 'https://pokeapi.co/api/v2/pokemon/2/'},
+//     {name: 'venusaur', url: 'https://pokeapi.co/api/v2/pokemon/3/'},
+//     {name: 'charmander', url: 'https://pokeapi.co/api/v2/pokemon/4/'},
+//     {name: 'charmeleon', url: 'https://pokeapi.co/api/v2/pokemon/5/'},
+//     {name: 'charizard', url: 'https://pokeapi.co/api/v2/pokemon/6/'},
+//     {name: 'squirtle', url: 'https://pokeapi.co/api/v2/pokemon/7/'},
+//     {name: 'wartortle', url: 'https://pokeapi.co/api/v2/pokemon/8/'},
+//     {name: 'blastoise', url: 'https://pokeapi.co/api/v2/pokemon/9/'},
+//     {name: 'caterpie', url: 'https://pokeapi.co/api/v2/pokemon/10/'},
+//     {name: 'metapod', url: 'https://pokeapi.co/api/v2/pokemon/11/'},
+//     {name: 'butterfree', url: 'https://pokeapi.co/api/v2/pokemon/12/'},
+//     {name: 'weedle', url: 'https://pokeapi.co/api/v2/pokemon/13/'}
+// ]
+    
+    // return array
+    // return [{name: 'my'}, {name: 'good'}, {name: 'guy'}]
+}
 
 // middleware
 app.use(express.json());
@@ -20,6 +50,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 // app.use('/users', usersRouter);
 app.use('/data', dataRouter)
 app.use('/anotherdata', anotherDataRouter);
+
+
 
 const expressGraphQL = require('express-graphql').graphqlHTTP
 const {
@@ -96,8 +128,8 @@ const PokemonType = new GraphQLObjectType({
     description: "This is a pokemon with data populated from the API",
     fields: () => ({
         // id: { type: new GraphQLNonNull(GraphQLInt) },
-        name: { type: GraphQLString },
-        id: { type: GraphQLInt } // I dont want it to be non nulled. it can be nulled to allow for quicker iteration of addPokemon
+        name: { type: new GraphQLNonNull(GraphQLString) },
+        id: { type: new GraphQLNonNull(GraphQLInt) } // I dont want it to be non nulled. it can be nulled to allow for quicker iteration of addPokemon
         
     })
 })
@@ -117,7 +149,21 @@ const RootQueryType = new GraphQLObjectType({
     pokemon: {
         type: new GraphQLList(PokemonType),
         description: 'List of Pokemon',
-        resolve: () => pokemon
+        resolve: async () => {
+            let allpokemon = await allPokemonAPI()
+            console.log('allpokemon')
+            console.log(allpokemon)
+            return allpokemon || 'nothing here'
+
+            // return [
+            //     {name: 'bulbasaur', id: 1},
+            //     {name: 'ivysaur', id: 2},
+            //     {name: 'venusaur', id: 3}
+            // ];
+
+            // return pokemon
+        }
+        // resolve: () => pokemon
     },
     books: {
       type: new GraphQLList(BookType),
