@@ -172,20 +172,20 @@ const RootQueryType = new GraphQLObjectType({
         }
     },
     test: {
-        // type: new GraphQLList(PokemonType),
-        type: GraphQLString,
+        type: new GraphQLList(PokemonType),
+        // type: GraphQLString,
         description: 'hit the route please',
         resolve: async () => {
 
-          //  let bucket = [];
-          //  let pokemon = await prisma.pokemon.findMany()
-          //  pokemon.forEach( (pokemon) => {
-          //   let obj = {name: pokemon.name, id: pokemon.id }
-          //   bucket.push(obj);
-          //  })
-          //  return bucket;       
-             
-           return pokemon[0].name  // this returns the name           
+           let bucket = [];
+           let pokemon = await prisma.pokemon.findMany()
+           pokemon.forEach( (pokemon) => {
+            let obj = {name: pokemon.name, id: pokemon.id }
+            bucket.push(obj);
+           })
+           return bucket;       
+
+          //  return pokemon[0].name  // this returns the name           
         }
     },    
     authors: {
