@@ -2,6 +2,9 @@ const express = require('express');
 const path = require("path");
 const cors = require('cors')
 const axios = require("axios")
+const { PrismaClient } = require('@prisma/client')
+const prisma = new PrismaClient()
+
 // const indexRouter = require('./routes/index');
 // const usersRouter = require('./routes/users');
 const dataRouter = require('./routes/data')
@@ -12,8 +15,10 @@ const PORT = 5000;
 const app = express();
 
 const allPokemonAPI = async () => {
+    console.log('prisma buddy')
+    console.log(prisma)
     // let predata = await axios.get(`https://pokeapi.co/`);
-    let bucket = new Array() || []
+    let bucket = []
     let pokemon = await axios.get(`https://pokeapi.co/api/v2/pokemon?limit=151`)
         let data = pokemon.data.results
         await data.forEach(data => bucket.push({name: data.name, id: bucket.length + 1 }))
@@ -48,12 +53,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // app.use('/', indexRouter);
 // app.use('/users', usersRouter);
-app.use('/data', dataRouter)
-app.use('/anotherdata', anotherDataRouter);
 
 
 
 const expressGraphQL = require('express-graphql').graphqlHTTP
+
 const {
   GraphQLSchema,
   GraphQLObjectType,
@@ -134,6 +138,10 @@ const PokemonType = new GraphQLObjectType({
     })
 })
 
+// app.js ----->    const predata = await fetch(`http://localhost:5000/pokemon?query={test}`)
+// localhost:5000/pokemon -----> app.use('/pokemon', expressGraphQL({      // pokemon is the first argument.
+// query = {book, allbooks, allpokemon, test } query becomes: RootQueryType key that holds the resolve function.
+
 const RootQueryType = new GraphQLObjectType({
   name: 'Query',
   description: 'Root Query',
@@ -146,30 +154,40 @@ const RootQueryType = new GraphQLObjectType({
       },
       resolve: (parent, args) => books.find(book => book.id === args.id)
     },
-    pokemon: {
-        type: new GraphQLList(PokemonType),
-        description: 'List of Pokemon',
-        resolve: async () => {
-            let allpokemon = await allPokemonAPI()
-            console.log('allpokemon')
-            console.log(allpokemon)
-            return allpokemon || 'nothing here'
-
-            // return [
-            //     {name: 'bulbasaur', id: 1},
-            //     {name: 'ivysaur', id: 2},
-            //     {name: 'venusaur', id: 3}
-            // ];
-
-            // return pokemon
-        }
-        // resolve: () => pokemon
-    },
-    books: {
+    allbooks: {
       type: new GraphQLList(BookType),
       description: 'List of All Books',
       resolve: () => books
     },
+    allpokemon: {
+        type: new GraphQLList(PokemonType),
+        description: 'List of Pokemon',
+        resolve: async () => {
+            // let allpokemon = await allPokemonAPI()
+            let bucket = []
+    let pokemon = await axios.get(`https://pokeapi.co/api/v2/pokemon?limit=151`)
+        let data = pokemon.data.results
+        await data.forEach(data => bucket.push({name: data.name, id: bucket.length + 1 }))
+        if (bucket) { return bucket }            
+        }
+    },
+    test: {
+        // type: new GraphQLList(PokemonType),
+        type: GraphQLString,
+        description: 'hit the route please',
+        resolve: async () => {
+
+          //  let bucket = [];
+          //  let pokemon = await prisma.pokemon.findMany()
+          //  pokemon.forEach( (pokemon) => {
+          //   let obj = {name: pokemon.name, id: pokemon.id }
+          //   bucket.push(obj);
+          //  })
+          //  return bucket;       
+             
+           return pokemon[0].name  // this returns the name           
+        }
+    },    
     authors: {
       type: new GraphQLList(AuthorType),
       description: 'List of All Authors',
@@ -190,6 +208,13 @@ const RootMutationType = new GraphQLObjectType({
   name: 'Mutation',
   description: 'Root Mutation',
   fields: () => ({
+    hello: {
+        type: GraphQLString,
+        description: 'Hey guys',
+        resolve: () => {
+            return "Hello To ALL"
+        }
+    },
     addBook: {
       type: BookType,
       description: 'Add a book',
@@ -237,10 +262,16 @@ const schema = new GraphQLSchema({
   mutation: RootMutationType
 })
 
-app.use('/graphql', expressGraphQL({
+
+    // http://localhost:5000/pokemon?query={authors{name}}
+// http://localhost:5000/pokemon?query={author(id:1){name}}
+app.use('/pokemon', expressGraphQL({
   schema: schema,
   graphiql: true
 }))
+
+app.use('/data', dataRouter)
+app.use('/anotherdata', anotherDataRouter);
 
 app.listen(PORT || 5000, () => console.log(`Any Port:${PORT} in a S T O R M !!`))
 
