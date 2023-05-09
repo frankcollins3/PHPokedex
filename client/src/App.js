@@ -1,18 +1,18 @@
 import './App.css';
-// import axios from 'axios';
-// import {useState, useEffect} from 'react';
+// import dotenv from "dotenv";
+// dotenv.config();
+
 
 function App() {
 
-  // const [data, setData] = useState([])
-  // const [response, setResponse] = useState([])
-
   const firefunc = async () => {
     console.log('firing the function')
-    const response = await fetch(`http://localhost:5000/data`);
+    const response = await fetch(`http://localhost:5000/pokemon?query={allbooks{name}}`);
+    // const response = await fetch(`http://localhost:5000/data`);
     const data = await response.json()
     console.log('data')
     console.log(data)
+  
   }
 
   const firefunc2 = async () => {
@@ -24,10 +24,7 @@ function App() {
   }
 
   const apitest = async () => {
-    // const predata = await fetch(`http://localhost:5000/pokemon?query={test{name,id}}`)
-
-    const predata = await fetch(`http://localhost:5000/pokemon?query={test}`) // for single string returning
-    
+    const predata = await fetch(`http://localhost:5000/pokemon?query={test{name,id}}`) // query={test} for single string querying
     const data = await predata.json()
     console.log('data')
     console.log(data)
