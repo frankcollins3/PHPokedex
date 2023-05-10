@@ -15,36 +15,36 @@
 /*  */
 
 /* grid  */
-.screen {
+.Screen {
   grid-area: screen;
-  border: 5px solid orange;
   justify-self: center;
   /* height: 50px; 
   width: 50px; */
 }
 .item-a {
-  grid-area: pokeballs;
-  border: 5px solid orange;
+  /* grid-area: pokeballs;   */
   height: 50px; 
   width: 50px;
   justify-self: center;
 }
 .item-b {
   /* grid-area: pokeballs; */
-  border: 5px solid blue;
   height: 50px; 
   width: 50px;
   justify-self: center;
 }
 .item-c {
   /* grid-area: pokeballs; */
-  border: 5px solid blueviolet;
   height: 50px; 
   width: 50px;
   justify-self: center;
 }
 
-.container {
+.Pokeball-Container  {
+  grid-area: pokeballs;
+}
+
+.Container {
   display: grid;
   grid-template-columns: 500px;
   /* grid-template-columns: 500px; */
@@ -73,6 +73,7 @@
   background-size: cover;
   background-repeat: no-repeat;
 }
+
 
 
 /* #IB2 { background-image: url('client/public/img/pokeball.png'); }
