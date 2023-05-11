@@ -1,9 +1,11 @@
 const express = require('express');
 const path = require("path");
-const cors = require('cors')
-const axios = require("axios")
-const { PrismaClient } = require('@prisma/client')
-const prisma = new PrismaClient()
+const cors = require('cors');
+const axios = require("axios");
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+const puppeteer = require("puppeteer");
+require("dotenv").config();
 
 // const indexRouter = require('./routes/index');
 // const usersRouter = require('./routes/users');
@@ -14,35 +16,12 @@ const anotherDataRouter = require('./routes/allPokemon')
 const PORT = 5000;
 const app = express();
 
-const allPokemonAPI = async () => {
-    console.log('prisma buddy')
-    console.log(prisma)
-    // let predata = await axios.get(`https://pokeapi.co/`);
+const allPokemonAPI = async () => {    
     let bucket = []
     let pokemon = await axios.get(`https://pokeapi.co/api/v2/pokemon?limit=151`)
         let data = pokemon.data.results
         await data.forEach(data => bucket.push({name: data.name, id: bucket.length + 1 }))
         if (bucket) { return bucket }
-
-// this array was taken from pokemondata.data.results    
-// let array = [
-//     {name: 'bulbasaur', url: 'https://pokeapi.co/api/v2/pokemon/1/'},
-//     {name: 'ivysaur', url: 'https://pokeapi.co/api/v2/pokemon/2/'},
-//     {name: 'venusaur', url: 'https://pokeapi.co/api/v2/pokemon/3/'},
-//     {name: 'charmander', url: 'https://pokeapi.co/api/v2/pokemon/4/'},
-//     {name: 'charmeleon', url: 'https://pokeapi.co/api/v2/pokemon/5/'},
-//     {name: 'charizard', url: 'https://pokeapi.co/api/v2/pokemon/6/'},
-//     {name: 'squirtle', url: 'https://pokeapi.co/api/v2/pokemon/7/'},
-//     {name: 'wartortle', url: 'https://pokeapi.co/api/v2/pokemon/8/'},
-//     {name: 'blastoise', url: 'https://pokeapi.co/api/v2/pokemon/9/'},
-//     {name: 'caterpie', url: 'https://pokeapi.co/api/v2/pokemon/10/'},
-//     {name: 'metapod', url: 'https://pokeapi.co/api/v2/pokemon/11/'},
-//     {name: 'butterfree', url: 'https://pokeapi.co/api/v2/pokemon/12/'},
-//     {name: 'weedle', url: 'https://pokeapi.co/api/v2/pokemon/13/'}
-// ]
-    
-    // return array
-    // return [{name: 'my'}, {name: 'good'}, {name: 'guy'}]
 }
 
 // middleware
@@ -50,11 +29,6 @@ app.use(express.json());
 app.use(cors())
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
-
-// app.use('/', indexRouter);
-// app.use('/users', usersRouter);
-
-
 
 const expressGraphQL = require('express-graphql').graphqlHTTP
 
@@ -96,6 +70,18 @@ const pokemon = [
     { id: 9, name: 'blastoise' }
 ]
 
+async function nameOrIdForData(key) {
+  if (key) {
+      // parameter can be an integer (pokemon.id) or a name (pokemon.name)
+// access axios. check for pokeAPI related endpoint data.abilities. and render that data or empty array. 
+      let predata = await axios.get(`https://pokeapi.co/api/v2/pokemon/${key}`)
+      let data = predata.data.abilities ? predata.data : []            
+      return data
+  } else {
+      return  
+  }            
+}
+
 const BookType = new GraphQLObjectType({
   name: 'Book',
   description: 'This represents a book written by an author',
@@ -131,16 +117,28 @@ const PokemonType = new GraphQLObjectType({
     name: 'Pokemon',
     description: "This is a pokemon with data populated from the API",
     fields: () => ({
+      
+      name: { type: new GraphQLNonNull(GraphQLString) },
+      type: { type: new GraphQLNonNull(GraphQLString) },
+      id: { type: GraphQLInt },
+
         // id: { type: new GraphQLNonNull(GraphQLInt) },
-        name: { type: new GraphQLNonNull(GraphQLString) },
-        id: { type: new GraphQLNonNull(GraphQLInt) } // I dont want it to be non nulled. it can be nulled to allow for quicker iteration of addPokemon
-        
+        // poke_id: { type: GraphQLInt },
+        // moves: { type: graphQLString },
+        // abilities: { type: GraphQLList },
+        // users: { type: GraphQLList },
+
     })
 })
 
-// app.js ----->    const predata = await fetch(`http://localhost:5000/pokemon?query={test}`)
-// localhost:5000/pokemon -----> app.use('/pokemon', expressGraphQL({      // pokemon is the first argument.
-// query = {book, allbooks, allpokemon, test } query becomes: RootQueryType key that holds the resolve function.
+const TestType = new GraphQLObjectType({
+  name: 'Test',
+  description: 'We are testing yet',
+  fields: () => ({
+    name: { type: new GraphQLNonNull(GraphQLString) },
+    // : { type: new GraphQLNonNull(GraphQLString) },
+  })
+})
 
 const RootQueryType = new GraphQLObjectType({
   name: 'Query',
@@ -159,7 +157,7 @@ const RootQueryType = new GraphQLObjectType({
       description: 'List of All Books',
       resolve: () => books
     },
-    allpokemon: {
+    allAPIpokemon: {
         type: new GraphQLList(PokemonType),
         description: 'List of Pokemon',
         resolve: async () => {
@@ -171,7 +169,7 @@ const RootQueryType = new GraphQLObjectType({
         if (bucket) { return bucket }            
         }
     },
-    test: {
+    allDBpokemon: {
         type: new GraphQLList(PokemonType),
         // type: GraphQLString,
         description: 'hit the route please',
@@ -179,15 +177,33 @@ const RootQueryType = new GraphQLObjectType({
 
            let bucket = [];
            let pokemon = await prisma.pokemon.findMany()
-           pokemon.forEach( (pokemon) => {
-            let obj = {name: pokemon.name, id: pokemon.id }
-            bucket.push(obj);
-           })
-           return bucket;       
-
+           pokemon.forEach( (pokemon) => { 
+             let obj = { name: pokemon.name, id: pokemon.id }
+            //  let obj = { name: pokemon.name, id: pokemon.id, type: pokemon.sprites.front_default }
+            //  let obj = { name: pokemon.name, id: pokemon.id, type: types[0].type }
+             // let obj = { name: pokemon.name, id: pokemon.id + 1}
+             bucket.push(obj);
+            })
+            return bucket;       
+          //   return pokemon
           //  return pokemon[0].name  // this returns the name           
         }
     },    
+    allDataAllPokemon: {
+      type: new GraphQLList(PokemonType),
+      // type: GraphQLString,
+      description: 'test again',
+      resolve: async() => {
+        let mydata = await nameOrIdForData('squirtle');
+
+        return [
+            { name: mydata.name, id: mydata.id, type: mydata.types[0].type.name },
+            { name: "myname_1.0", id: 333, type: "yes" },
+            { name: "myname_2.0", id: 777, type: "more yes" }
+        ]
+      }
+    },
+
     authors: {
       type: new GraphQLList(AuthorType),
       description: 'List of All Authors',
@@ -263,8 +279,6 @@ const schema = new GraphQLSchema({
 })
 
 
-    // http://localhost:5000/pokemon?query={authors{name}}
-// http://localhost:5000/pokemon?query={author(id:1){name}}
 app.use('/pokemon', expressGraphQL({
   schema: schema,
   graphiql: true
