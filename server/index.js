@@ -115,21 +115,14 @@ const AuthorType = new GraphQLObjectType({
 
 const PokemonType = new GraphQLObjectType({
     name: 'Pokemon',
-    description: "This is a pokemon with data populated from the API",
-    fields: () => ({
-      
+    description: "Pokemon data from Pokeapi.co for Postgres database",
+    fields: () => ({      
       name: { type: new GraphQLNonNull(GraphQLString) },
       type: { type: new GraphQLNonNull(GraphQLString) },
-      id: { type: GraphQLInt },
-
-        // id: { type: new GraphQLNonNull(GraphQLInt) },
-        // poke_id: { type: GraphQLInt },
-        // moves: { type: graphQLString },
-        // abilities: { type: GraphQLList },
-        // users: { type: GraphQLList },
-
-    })
-})
+      poke_id: { type: GraphQLInt },
+      moves: { type: GraphQLString },
+      abilities: { type: GraphQLString },
+    })})
 
 const TestType = new GraphQLObjectType({
   name: 'Test',
@@ -165,7 +158,7 @@ const RootQueryType = new GraphQLObjectType({
             let bucket = []
     let pokemon = await axios.get(`https://pokeapi.co/api/v2/pokemon?limit=151`)
         let data = pokemon.data.results
-        await data.forEach(data => bucket.push({name: data.name, id: bucket.length + 1 }))
+        await data.forEach(data => bucket.push({name: data.name, poke_id: bucket.length + 1 }))
         if (bucket) { return bucket }            
         }
     },
@@ -178,7 +171,7 @@ const RootQueryType = new GraphQLObjectType({
            let bucket = [];
            let pokemon = await prisma.pokemon.findMany()
            pokemon.forEach( (pokemon) => { 
-             let obj = { name: pokemon.name, id: pokemon.id }
+             let obj = { name: pokemon.name, poke_id: pokemon.id }
             //  let obj = { name: pokemon.name, id: pokemon.id, type: pokemon.sprites.front_default }
             //  let obj = { name: pokemon.name, id: pokemon.id, type: types[0].type }
              // let obj = { name: pokemon.name, id: pokemon.id + 1}
@@ -190,17 +183,24 @@ const RootQueryType = new GraphQLObjectType({
         }
     },    
     allDataAllPokemon: {
-      type: new GraphQLList(PokemonType),
-      // type: GraphQLString,
-      description: 'test again',
-      resolve: async() => {
-        let mydata = await nameOrIdForData('squirtle');
-
-        return [
-            { name: mydata.name, id: mydata.id, type: mydata.types[0].type.name },
-            { name: "myname_1.0", id: 333, type: "yes" },
-            { name: "myname_2.0", id: 777, type: "more yes" }
-        ]
+      type: PokemonType,
+      // type: new GraphQLList(PokemonType),
+      description: 'retrieve pokeAPI.co/pokemon data-> types, abilities, other data excluded from main pokeAPI.co/ endpoint ',// dont want either args: NonNull..  user can either enter a name or ID. if name as args and exlude NonNull ID from args. error from NonNull.
+      args: {
+        name: { type: GraphQLString },
+        id: { type: GraphQLInt }
+      },
+      resolve: async(parent, args) => {
+        let mydata = await nameOrIdForData(args.name||args.id);
+        if (mydata && typeof mydata === 'object') {
+          let obj = { 
+            name: mydata.name, 
+            poke_id: mydata.id, 
+            type: mydata.types ? mydata.types[0].type.name : "no type", 
+            moves: mydata.moves ? mydata.moves[0].move.name : "no moves", 
+            abilities: mydata.abilities ? mydata.abilities[0].ability.name : "no abilities"}
+          return obj        
+        } else { return "nothing"}        
       }
     },
 
@@ -265,7 +265,7 @@ const RootMutationType = new GraphQLObjectType({
             // id: { type: GraphQLString}
         },
         resolve: (parent, args) => {
-            const poke = { id: pokemon.length + 1, name: args.name }
+            const poke = { poke_id: pokemon.length + 1, name: args.name }
         pokemon.push(poke)
         return poke
         }
