@@ -8,6 +8,7 @@ import {useEffect, useState} from "react"
 
 // redux
 import store from "../../redux/store"
+import actionObject from "../../redux/actions.js"
 
 function GoPage () {
 
@@ -48,13 +49,17 @@ function GoPage () {
     console.log(data)
   }
 
-  const getstate = () => {
+  const getstate = async () => {
     console.log('pokemon this is the setState()')
     console.log(pokemon)
 
     console.log('store from GoPage')
     console.log(store)
     console.log(store.getState())
+    
+    let slowpoke = await actionObject.slowpoke()
+    console.log('actionObject endpoint:')
+    console.log(slowpoke)
   }
 
 
