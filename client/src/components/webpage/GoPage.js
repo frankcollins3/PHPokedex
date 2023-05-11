@@ -10,17 +10,16 @@ const firefunc = async () => {
 
     // (name:"slowpoke") is the resolve: (parent, args) => it is the args that becomes the resolve function parameters in RootQueryType server/index.js
     //     /pokemon is from app.use('pokemon', ExpressGraphQL({}))   /query={allDataAllPokemon} is the key with the resolve function RootQueryType
-    const response = await axios.post('http://localhost:5000/pokemon?query={allDataAllPokemon(id:53){name,id,type,moves}}');
+    const response = await axios.post('http://localhost:5000/pokemon?query={allDataAllPokemon(id:103){name,poke_id,type,moves,abilities}}');
     console.log('response')
     console.log(response)
-    for (let i = 0; i < 151; i++) {
-      const loopdata = await axios.post(`http://localhost:5000/pokemon?query={allDataAllPokemon(id:${i+1}){name,id,type,moves}}`)
+
+    for (let i = 0; i < 151; i++) { // c for (int i = 0; i < sizeof(*pokemon); i++) {}
+      const loopdata = await axios.post(`http://localhost:5000/pokemon?query={allDataAllPokemon(id:${i+1}){name,poke_id,type,moves,abilities}}`)
       console.log('loopdata')
       console.log(loopdata)
     }
-
-    // c for (int i = 0; i < sizeof(*pokemon); i++) {}
-    return response.data || 'no response'
+    return response.data ? response.data : []
   }
 
   const firefunc2 = async () => {
