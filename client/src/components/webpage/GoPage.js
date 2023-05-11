@@ -6,7 +6,8 @@ import nameOrIdForData from '../../utility/nameOrIdForData'
 import axios from 'axios'
 import {useEffect, useState} from "react"
 
-
+// redux
+import store from "../../redux/store"
 
 function GoPage () {
 
@@ -50,6 +51,10 @@ function GoPage () {
   const getstate = () => {
     console.log('pokemon this is the setState()')
     console.log(pokemon)
+
+    console.log('store from GoPage')
+    console.log(store)
+    console.log(store.getState())
   }
 
 
