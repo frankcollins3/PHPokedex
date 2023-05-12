@@ -14,14 +14,48 @@
 /* flexbox end */
 
 .Screen {
-  height: 400px;
-  width: 400px;
+  height: 500px;
+  width: 500px;
   display: grid;
   grid-area: screen;
   justify-self: center;
   align-content: center;
   justify-content: center;
+  /* overflow-y: scroll;  */
+  overflow: scroll;
 }
+
+.Screen div:nth-child(odd) {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 5px solid orange;
+}
+
+
+.Screen-List {
+  /* border: 5px solid orange; */
+}
+
+#Pokemon-Screen-Card {
+  /* border: 10px dotted olivedrab; */
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.Pokemon-Screen-Data {  
+  list-style-type: none;
+  margin-top: 0.45em;
+  color: #f6feff;
+  /* border: 5px solid pink; */
+  /* margin: 1em; */
+}
+
+.Pokemon-Screen-Img {
+  height: 95px;
+  width: 125px;
+}
+  
 .pokeball {
   height: 50px; 
   width: 50px;
