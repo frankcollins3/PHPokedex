@@ -6,35 +6,33 @@
   min-width: 100vw;
 }
 
-/* flexbox  */
+/* flexbox */
 .flex { display: flex; }
 .column { flex-direction: column; }
 .row { flex-direction: row; }
 .justCenterAlignCenter { justify-content: center; align-items: center; }
+/* flexbox end */
 
-/*  */
-
-/* grid  */
 .Screen {
+  height: 400px;
+  width: 400px;
+  display: grid;
   grid-area: screen;
   justify-self: center;
-  /* height: 50px; 
-  width: 50px; */
+  align-content: center;
+  justify-content: center;
 }
-.item-a {
-  /* grid-area: pokeballs;   */
+.pokeball {
   height: 50px; 
   width: 50px;
   justify-self: center;
 }
-.item-b {
-  /* grid-area: pokeballs; */
+.greatball {
   height: 50px; 
   width: 50px;
   justify-self: center;
 }
-.item-c {
-  /* grid-area: pokeballs; */
+.ultraball {
   height: 50px; 
   width: 50px;
   justify-self: center;
@@ -44,23 +42,18 @@
   grid-area: pokeballs;
 }
 
+.gear { height: 50px; width: 50px; }
+
 .Container {
   display: grid;
   grid-template-columns: 500px;
-  /* grid-template-columns: 500px; */
   grid-template-rows: auto;
   justify-content: center;
   align-content: center;
   grid-template-areas: 
     "screen"
-    "pokeballs" "pokeballs" "pokeballs";
-    /* "main main . sidebar"
-    "footer footer footer footer"; */
-  /* justify-self: center; */
+    "pokeballs" "pokeballs" "pokeballs";    
 }
-
-/*  */
-
 
 .Intro-Buttons {
   border-radius: 50%;
@@ -73,9 +66,3 @@
   background-size: cover;
   background-repeat: no-repeat;
 }
-
-
-
-/* #IB2 { background-image: url('client/public/img/pokeball.png'); }
-#IB2 { background-image: url('client/public/img/greatball.png'); }
-#IB3 { background-image: url('client/public/img/greatball.png'); } */
