@@ -212,33 +212,67 @@ const RootQueryType = new GraphQLObjectType({
       }
     },
     puppeteer: {
-      type: new GraphQLList(GraphQLString),
-      // type: GraphQLString,
-      // type: new GraphQLList(GraphQLString),
+      type: new GraphQLList(GraphQLString),    
       description: 'Invoke Puppeteer',
-
-
       resolve: async () => {
-        // return "hey nice work guys"
-  
-          // Launch a new browser window
-  const browser = await puppeteer.launch({headless: false})
-  
-  // Open a new page and navigate to youtube.com
-  const page = await browser.newPage();
-  await page.goto('https://www.youtube.com');
-  
-  // Take a screenshot of the page
-  await page.screenshot({path: 'youtube.png'});
-  
-  // Close the browser
-  await browser.close();
+        const gotoJS = async (url) => {
+          const url_path = url;
+          let browser;
+          const mine_nugget_url = 'https://mine-nugget.vercel.app/'
+          const pokedex_url = 'https://6370dd3642049a3b9b369a98--pokedex-of-kanto.netlify.app/'
 
-        return 'fannie miller' || page || pagenav || "big show"
-        
+    
+          const promises = [
+            new Promise((resolve) => {
+              browser = puppeteer.launch();
+              browser.then((browserInstance) => {
+                resolve(browserInstance);
+              });
+            }),            
+            new Promise((resolve) => {
+              browser.then((browserInstance) => {
+                const page = browserInstance.newPage();
+                page.goto(url || url_path).then(() => {
+                  resolve(page);
+                });
+              });
+            })
+          ];
+          
+    
+          try {
+            console.log("does it even execute this try block");
+            const [browserInstance, page] = await Promise.all(promises);
+            await browserInstance.close();
+            return "hey mama"
+          } catch (err) {
+            console.log('this is the error from browserPromise :D');
+          }
+
+        };
+    
+        const getPhotos = async () => {
+          await setTimeout(async () => {
+            new Promise((resolve) => {
+              const t = true
+              const f = false
+              const game = [t, f]
+              const flipcoin = game[Math.floor(Math.random()*game.length)]
+              alert(flipcoin)
+              console.log('flipcoin')
+              console.log(flipcoin)
+              flipcoin === t ? url = mine_nugget_url : pokedex_url
+          }),
+            await gotoJS(url);
+          }, 1000);
+        };
+    
+        await getPhotos();
+    
+        return ['hey', 'nice', 'one'];
+        // return 'hey good sir' || page || pagenav || "hey theres no way"        
       }
     },
-
     authors: {
       type: new GraphQLList(AuthorType),
       description: 'List of All Authors',
