@@ -118,10 +118,11 @@ const PokemonType = new GraphQLObjectType({
     description: "Pokemon data from Pokeapi.co for Postgres database",
     fields: () => ({      
       name: { type: new GraphQLNonNull(GraphQLString) },
+      poke_id: { type: new GraphQLNonNull(GraphQLInt) },
       type: { type: new GraphQLNonNull(GraphQLString) },
-      poke_id: { type: GraphQLInt },
       moves: { type: GraphQLString },
       abilities: { type: GraphQLString },
+      image: { type: GraphQLString },
     })})
 
 const TestType = new GraphQLObjectType({
@@ -157,6 +158,7 @@ const RootQueryType = new GraphQLObjectType({
             // let allpokemon = await allPokemonAPI()
             let bucket = []
     let pokemon = await axios.get(`https://pokeapi.co/api/v2/pokemon?limit=151`)
+    // let pokemon = await axios.get(`https://pokeapi.co/api/v2/pokemon?limit=151`)
         let data = pokemon.data.results
         await data.forEach(data => bucket.push({name: data.name, poke_id: bucket.length + 1 }))
         if (bucket) { return bucket }            
@@ -177,7 +179,8 @@ const RootQueryType = new GraphQLObjectType({
              // let obj = { name: pokemon.name, id: pokemon.id + 1}
              bucket.push(obj);
             })
-            return bucket;       
+            return bucket; 
+                  
           //   return pokemon
           //  return pokemon[0].name  // this returns the name           
         }
@@ -192,15 +195,47 @@ const RootQueryType = new GraphQLObjectType({
       },
       resolve: async(parent, args) => {
         let mydata = await nameOrIdForData(args.name||args.id);
-        if (mydata && typeof mydata === 'object') {
+        
+        if (mydata) {
+        // if (mydata && typeof mydata === 'object') {
           let obj = { 
             name: mydata.name, 
             poke_id: mydata.id, 
             type: mydata.types ? mydata.types[0].type.name : "no type", 
             moves: mydata.moves ? mydata.moves[0].move.name : "no moves", 
-            abilities: mydata.abilities ? mydata.abilities[0].ability.name : "no abilities"}
-          return obj        
+            abilities: mydata.abilities ? mydata.abilities[0].ability.name : "no abilities",
+            image: mydata.sprites ? mydata.sprites.front_default : "no sprite images"
+          }
+          return obj
+
         } else { return "nothing"}        
+      }
+    },
+    puppeteer: {
+      type: new GraphQLList(GraphQLString),
+      // type: GraphQLString,
+      // type: new GraphQLList(GraphQLString),
+      description: 'Invoke Puppeteer',
+
+
+      resolve: async () => {
+        // return "hey nice work guys"
+  
+          // Launch a new browser window
+  const browser = await puppeteer.launch({headless: false})
+  
+  // Open a new page and navigate to youtube.com
+  const page = await browser.newPage();
+  await page.goto('https://www.youtube.com');
+  
+  // Take a screenshot of the page
+  await page.screenshot({path: 'youtube.png'});
+  
+  // Close the browser
+  await browser.close();
+
+        return 'fannie miller' || page || pagenav || "big show"
+        
       }
     },
 
