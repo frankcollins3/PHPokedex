@@ -215,62 +215,47 @@ const RootQueryType = new GraphQLObjectType({
       type: new GraphQLList(GraphQLString),    
       description: 'Invoke Puppeteer',
       resolve: async () => {
-        const gotoJS = async (url) => {
-          const url_path = url;
-          let browser;
-          const mine_nugget_url = 'https://mine-nugget.vercel.app/'
-          const pokedex_url = 'https://6370dd3642049a3b9b369a98--pokedex-of-kanto.netlify.app/'
 
-    
-          const promises = [
-            new Promise((resolve) => {
-              browser = puppeteer.launch();
-              browser.then((browserInstance) => {
-                resolve(browserInstance);
-              });
-            }),            
-            new Promise((resolve) => {
-              browser.then((browserInstance) => {
-                const page = browserInstance.newPage();
-                page.goto(url || url_path).then(() => {
-                  resolve(page);
-                });
-              });
+          // const url_path = url;
+          // const mine_nugget_url = 'https://mine-nugget.vercel.app/'
+          // const pokedex_url = 'https://6370dd3642049a3b9b369a98--pokedex-of-kanto.netlify.app/'
+
+          // const browser = await puppeteer.launch({headless: false});
+          // const page = await browser.newPage();
+
+          let promises = [
+            puppeteer.launch({headless: false}).then(async(browser) => {
+              const page = await browser.newPage();
+              // page.goto(`https://www.google.com`);
+              await page.goto('https://www.w3schools.com/tryit/tryit.asp?filename=tryhtml_hello')
+              await page.screenshot({ path: 'w3schools.png' })
+
+              await page.evaluate(async() => {
+                  await window.history.pushState({}, '', '/');                  
+              })
+
             })
-          ];
-          
-    
-          try {
-            console.log("does it even execute this try block");
-            const [browserInstance, page] = await Promise.all(promises);
-            await browserInstance.close();
-            return "hey mama"
-          } catch (err) {
-            console.log('this is the error from browserPromise :D');
-          }
+            // const page = await browser.newPage();
+          ]
 
-        };
-    
-        const getPhotos = async () => {
-          await setTimeout(async () => {
-            new Promise((resolve) => {
-              const t = true
-              const f = false
-              const game = [t, f]
-              const flipcoin = game[Math.floor(Math.random()*game.length)]
-              alert(flipcoin)
-              console.log('flipcoin')
-              console.log(flipcoin)
-              flipcoin === t ? url = mine_nugget_url : pokedex_url
-          }),
-            await gotoJS(url);
-          }, 1000);
-        };
-    
-        await getPhotos();
-    
+          await Promise.all(promises)
+
+          // });            
+
+            // let promises = [
+              // browser, page, page.goto('https://www.google.com'), page.screenshot({ path: 'gooogle.png' })
+              // browser, page, page.goto('https://www.w3schools.com/tryit/tryit.asp?filename=tryhtml_hello'), typecode, page.screenshot({ path: 'w3schools.png' })                            
+            // ]
+            // await Promise.all(promises)
+
+            // const browser = await puppeteer.launch();
+            // const page = await browser.newPage();
+            // await page.goto('https://www.google.com');
+            // await page.screenshot({ path: 'google.png' });
+            // await browser.close();
+          // })();
+
         return ['hey', 'nice', 'one'];
-        // return 'hey good sir' || page || pagenav || "hey theres no way"        
       }
     },
     authors: {
