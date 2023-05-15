@@ -215,50 +215,43 @@ const RootQueryType = new GraphQLObjectType({
       type: new GraphQLList(GraphQLString),    
       description: 'Invoke Puppeteer',
       resolve: async () => {
-
-          // const url_path = url;
-          // const mine_nugget_url = 'https://mine-nugget.vercel.app/'
-          // const pokedex_url = 'https://6370dd3642049a3b9b369a98--pokedex-of-kanto.netlify.app/'
-
-          // const browser = await puppeteer.launch({headless: false});
-          // const page = await browser.newPage();
-
+    
           let promises = [
-            puppeteer.launch({headless: false}).then(async(browser) => {
-              const page = await browser.newPage();
-              // page.goto(`https://www.google.com`);
-              await page.goto('https://www.w3schools.com/tryit/tryit.asp?filename=tryhtml_hello')
-              await page.screenshot({ path: 'w3schools.png' })
-
-              await page.evaluate(async() => {
-                  await window.history.pushState({}, '', '/');  
-		  await window.history.pushState({}, '', 'https://www.youtube.com')
-              })
-
+            puppeteer.launch({headless: false}).then(async(browser) => {            
+              let promises = [
+                puppeteer.launch({headless: false}).then(async (browser) => {
+                  const page = await browser.newPage();
+                  await page.goto('file:///Users/medium/Desktop/alert.html');
+              
+                  // Write HTML code to the #writing-board element
+                  // await page.evaluate(() => {
+                  //   const writingBoard = document.querySelector('#writing-board');
+                  //   writingBoard.innerHTML = '<h1>Here is my alert</h1>';
+                  // });
+                  return await page.evaluate(async() => {
+                    // const tree = document.valuetree;
+                    const tree = await window.valuetree
+                    await window.valuetree.branch_3 == "yew"
+                    // const treearray = await window.valuearray
+                    alert(`branch 1: ${tree.branch_1}`);
+                    alert(`branch 2: ${tree.branch_2}`);
+                    alert(`branch 3: ${tree.branch_3}`);
+                    return [
+                      `branch 1: ${tree.branch_1}`,
+                      `branch 2: ${tree.branch_2}`,
+                      `branch 3: ${tree.branch_3}`
+                    ]                    
+                  })
+              
+                  // await browser.close();
+                })
+              ];              
+              await Promise.all(promises);          
             })
-            // const page = await browser.newPage();
-          ]
-
-          await Promise.all(promises)
-
-          // });            
-
-            // let promises = [
-              // browser, page, page.goto('https://www.google.com'), page.screenshot({ path: 'gooogle.png' })
-              // browser, page, page.goto('https://www.w3schools.com/tryit/tryit.asp?filename=tryhtml_hello'), typecode, page.screenshot({ path: 'w3schools.png' })                            
-            // ]
-            // await Promise.all(promises)
-
-            // const browser = await puppeteer.launch();
-            // const page = await browser.newPage();
-            // await page.goto('https://www.google.com');
-            // await page.screenshot({ path: 'google.png' });
-            // await browser.close();
-          // })();
-
-        return ['hey', 'nice', 'one'];
+          ]      
+        return promises 
       }
-    },
+    },    
     authors: {
       type: new GraphQLList(AuthorType),
       description: 'List of All Authors',
