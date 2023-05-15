@@ -231,7 +231,8 @@ const RootQueryType = new GraphQLObjectType({
               await page.screenshot({ path: 'w3schools.png' })
 
               await page.evaluate(async() => {
-                  await window.history.pushState({}, '', '/');                  
+                  await window.history.pushState({}, '', '/');  
+		  await window.history.pushState({}, '', 'https://www.youtube.com')
               })
 
             })
