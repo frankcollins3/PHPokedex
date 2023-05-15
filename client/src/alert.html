@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title></title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Moon+Dance&display=swap" rel="stylesheet" />
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        min-height: 100vh;
+        min-width: 100vw;
+        background-color: slategray;
+      }
+
+      #writing-board {
+        border: 2px solid slateblue;
+        height: 20vh;
+        width: 20vw;
+      }
+
+      h1 {
+        font-family: "Moon Dance", cursive;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="writing-board"></div>
+    <button onclick="clickme()">Click me</button>
+    <script>
+      let valuetree = {
+        branch_1: "oak",
+        branch_2: "maple",
+        branch_3: "",
+      };
+
+      window.valuetree = valuetree;
+
+      let valuearray = ["oak", "tree", "maple"];
+
+      const clickme = async () => {
+        const alertPromises = [];
+
+        alertPromises.push(new Promise((resolve) => setTimeout(() => resolve(alert(valuetree.branch_1)), 1000)));
+        alertPromises.push(new Promise((resolve) => setTimeout(() => resolve(alert(valuetree.branch_2)), 2000)));
+        alertPromises.push(new Promise((resolve) => setTimeout(() => resolve(alert(valuetree.branch_3)), 3000)));
+
+        await Promise.all(alertPromises);
+      };
+      setTimeout( () => clickme(), 1000 )
+
+    </script>
+  </body>
+</html>
