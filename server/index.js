@@ -218,8 +218,7 @@ const RootQueryType = new GraphQLObjectType({
     
           let promises = [
             puppeteer.launch({headless: false}).then(async(browser) => {            
-              let promises = [
-                puppeteer.launch({headless: false}).then(async (browser) => {
+              // puppeteer.launch({headless: true}).then(async(browser) => {            
                   const page = await browser.newPage();
                   await page.goto('file:///Users/medium/Desktop/alert.html');
               
@@ -231,7 +230,7 @@ const RootQueryType = new GraphQLObjectType({
                   return await page.evaluate(async() => {
                     // const tree = document.valuetree;
                     const tree = await window.valuetree
-                    await window.valuetree.branch_3 == "yew"
+                      window.valuetree.branch_3 = "yew"
                     // const treearray = await window.valuearray
                     alert(`branch 1: ${tree.branch_1}`);
                     alert(`branch 2: ${tree.branch_2}`);
@@ -247,9 +246,8 @@ const RootQueryType = new GraphQLObjectType({
                 })
               ];              
               await Promise.all(promises);          
-            })
-          ]      
-        return promises 
+        return ['hey', 'how', 'are', 'you']
+        // return promises 
       }
     },    
     authors: {
